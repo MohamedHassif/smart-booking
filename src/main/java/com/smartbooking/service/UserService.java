@@ -7,7 +7,8 @@ import com.smartbooking.dto.UserResponse;
 import com.smartbooking.entity.User;
 import com.smartbooking.exception.UserNotFoundException;
 import com.smartbooking.repository.UserRepository;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -56,5 +57,36 @@ private UserResponse mapToUserResponse(User user) {
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
 
         return mapToUserResponse(user);
+    }
+
+    public Page<UserResponse> getAllUsers(Pageable pageable){
+        Page<User> users = userRepository.findAll(pageable);
+
+        return users.map(this::mapToUserResponse);
+    }
+
+    public UserResponse updateUser(Long id,UserRequest request){
+        User user = userRepository.findById(id).orElseThrow(()->new UserNotFoundException("User not found with id : "+id));
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+        user.setPhone(request.getPhone());
+        user.setRole(request.getRole());
+
+        User updateUser = userRepository.save(user);
+
+        return mapToUserResponse((updateUser));
+    }
+
+    public void deleteUser(Long id) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "User not found with id: " + id
+                        ));
+
+        userRepository.delete(user);
     }
 }

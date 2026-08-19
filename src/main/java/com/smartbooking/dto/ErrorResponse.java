@@ -13,6 +13,7 @@ public class ErrorResponse {
     public ErrorResponse(int status, String message,Map<String, String> errors) {
         this.status = status;
         this.message = message;
+        this.errors = errors;
         this.timestamp = LocalDateTime.now();
     }
 

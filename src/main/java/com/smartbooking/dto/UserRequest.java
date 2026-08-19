@@ -1,5 +1,6 @@
 package com.smartbooking.dto;
 
+import com.smartbooking.entity.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -23,8 +24,7 @@ public class UserRequest {
     @NotBlank(message = "Phone number is required")
     private String phone;
 
-    @NotBlank(message = "Role is required")
-    private String role;
+    private UserRole role;
 
     public String getFirstName() {
         return firstName;
@@ -66,11 +66,11 @@ public class UserRequest {
         this.phone = phone;
     }
 
-    public String getRole() {
+    public UserRole getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 }

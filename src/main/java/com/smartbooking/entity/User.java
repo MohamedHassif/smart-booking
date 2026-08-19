@@ -1,10 +1,6 @@
 package com.smartbooking.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
@@ -18,7 +14,8 @@ public class User {
     private String email;
     private String password;
     private String phone;
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
 
     public Long getId() {
@@ -64,11 +61,11 @@ public class User {
         this.phone = phone;
     }
 
-    public String getRole() {
+    public UserRole getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 }
