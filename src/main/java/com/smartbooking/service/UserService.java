@@ -1,5 +1,6 @@
 package com.smartbooking.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.smartbooking.dto.UserRequest;
@@ -9,12 +10,15 @@ import com.smartbooking.exception.UserNotFoundException;
 import com.smartbooking.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-@Service
+@Service //This class should be managed by me
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder) {
+
         this.userRepository = userRepository;
+        this.passwordEncoder=passwordEncoder;
     }
 private UserResponse mapToUserResponse(User user) {
 
@@ -35,7 +39,7 @@ private UserResponse mapToUserResponse(User user) {
     user.setFirstName(request.getFirstName());
     user.setLastName(request.getLastName());
     user.setEmail(request.getEmail());
-    user.setPassword(request.getPassword());
+    user.setPassword(passwordEncoder.encode(request.getPassword()));
     user.setPhone(request.getPhone());
     user.setRole(request.getRole());
 
