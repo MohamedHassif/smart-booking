@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.smartbooking.dto.ErrorResponse;
 
+import org.springframework.security.core.AuthenticationException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -49,6 +51,17 @@ public class GlobalExceptionHandler {
         );
     }
 
+
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleAuthenticationException(AuthenticationException authenticationException){
+        return new ErrorResponse(
+                401,
+                "Invalid email or password",
+                null
+        );
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(Exception exception) {
@@ -61,4 +74,5 @@ public class GlobalExceptionHandler {
                 null
         );
     }
+
 }
