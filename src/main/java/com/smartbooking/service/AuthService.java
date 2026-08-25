@@ -14,8 +14,11 @@ public class AuthService {
 //    private final UserRepository userRepository;
 //    private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    public AuthService(AuthenticationManager authenticationManager){
+    private final JwtService jwtService;
+
+    public AuthService(AuthenticationManager authenticationManager, JwtService jwtService){
         this.authenticationManager=authenticationManager;
+        this.jwtService = jwtService;
     }
 
 //    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManagerBuilder authenticationManagerBuilder){
@@ -32,9 +35,12 @@ public class AuthService {
 //        return user;
 //    }
 
-    public void login(LoginRequest request){
+    public String login(LoginRequest request){
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword())
         );
+
+        return jwtService.generateToken(request.getEmail());
     }
 }

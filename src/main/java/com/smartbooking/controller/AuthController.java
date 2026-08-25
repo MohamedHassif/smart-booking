@@ -19,7 +19,7 @@ public class AuthController {
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
     public String login(@Valid @RequestBody LoginRequest request){
-        authService.login(request);
-        return "Login Successful";
+
+        return authService.login(request);
     }
 }

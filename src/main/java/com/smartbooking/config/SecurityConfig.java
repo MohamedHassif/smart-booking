@@ -1,5 +1,6 @@
 package com.smartbooking.config;
 
+import com.smartbooking.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -9,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration //Here are some objects that I want you to create and manage
 //marks a class as a source of bean definitions and configuration that Spring processes.
@@ -22,6 +24,14 @@ public class SecurityConfig {
             return new BCryptPasswordEncoder();
         }
 
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtAuthenticationFilter) {
+
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
             throws Exception {
@@ -32,7 +42,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/api/users").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
                         .anyRequest().authenticated()
-                );
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
