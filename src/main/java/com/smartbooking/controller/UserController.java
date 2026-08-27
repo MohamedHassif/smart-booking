@@ -61,4 +61,9 @@ public class UserController {
 
         userService.deleteUser(id);
     }
+
+    @GetMapping("/admin-test")
+    public String adminTest() {
+        return "Admin access successful";
+    }
 }
