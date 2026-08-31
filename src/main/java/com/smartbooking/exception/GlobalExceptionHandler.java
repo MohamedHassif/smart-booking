@@ -3,6 +3,8 @@ package com.smartbooking.exception;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.smartbooking.booking.exception.BookingNotFoundException;
+import com.smartbooking.booking.exception.BookingOperationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -84,6 +86,29 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(
                 403,
                 "Access denied",
+                null
+        );
+    }
+
+    @ExceptionHandler(BookingNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleBookingNotFound(BookingNotFoundException exception){
+
+        return new ErrorResponse(
+                404,
+                exception.getMessage(),
+                null
+        );
+    }
+
+    @ExceptionHandler(BookingOperationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleBookingOperation(
+            BookingOperationException exception) {
+
+        return new ErrorResponse(
+                400,
+                exception.getMessage(),
                 null
         );
     }
