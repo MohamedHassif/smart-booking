@@ -11,6 +11,8 @@ import com.smartbooking.booking.repository.BookingRepository;
 import com.smartbooking.entity.User;
 import com.smartbooking.exception.UserNotFoundException;
 import com.smartbooking.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -144,5 +146,29 @@ public class BookingService {
 
         return mapToBookingResponse(updatedBooking);
     }
+    @Transactional(readOnly = true)
+    public Page<BookingResponse> getAllBookings(Pageable pageable){
+
+        return bookingRepository
+                .findAll(pageable)
+                .map(this::mapToBookingResponse);
+    }
+
+    public BookingResponse confirmBooking(Long bookingId){
+
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(()-> new BookingNotFoundException("Booking not found"));
+
+        if(booking.getStatus() != BookingStatus.PENDING){
+            throw new BookingOperationException("Only pending booking can be CONFIRMED");
+        }
+
+        booking.setStatus(BookingStatus.CONFIRMED);
+
+        Booking updateBooking = bookingRepository.save(booking);
+
+        return mapToBookingResponse(updateBooking);
+    }
+
+
 
 }
