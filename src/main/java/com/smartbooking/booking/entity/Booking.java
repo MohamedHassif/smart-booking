@@ -28,6 +28,16 @@ public class Booking {
     @JoinColumn(name = "user_id",nullable = false) //The bookings.user_id column is the foreign key that connects this booking to the User.
     private User user;
 
+    @Version
+    private Long version;
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
 
     public Long getId() {
         return id;

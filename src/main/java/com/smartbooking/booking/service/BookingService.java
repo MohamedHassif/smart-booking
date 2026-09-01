@@ -8,11 +8,13 @@ import com.smartbooking.booking.entity.BookingStatus;
 import com.smartbooking.booking.exception.BookingNotFoundException;
 import com.smartbooking.booking.exception.BookingOperationException;
 import com.smartbooking.booking.repository.BookingRepository;
+import com.smartbooking.booking.specification.BookingSpecification;
 import com.smartbooking.entity.User;
 import com.smartbooking.exception.UserNotFoundException;
 import com.smartbooking.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -146,13 +148,13 @@ public class BookingService {
 
         return mapToBookingResponse(updatedBooking);
     }
-    @Transactional(readOnly = true)
-    public Page<BookingResponse> getAllBookings(Pageable pageable){
-
-        return bookingRepository
-                .findAll(pageable)
-                .map(this::mapToBookingResponse);
-    }
+//    @Transactional(readOnly = true)
+//    public Page<BookingResponse> getAllBookings(Pageable pageable){
+//
+//        return bookingRepository
+//                .findAll(pageable)
+//                .map(this::mapToBookingResponse);
+//    }
 
     public BookingResponse confirmBooking(Long bookingId){
 
@@ -169,6 +171,23 @@ public class BookingService {
         return mapToBookingResponse(updateBooking);
     }
 
+    @Transactional(readOnly = true)
+    public Page<BookingResponse> searchBookings(
+            BookingStatus status,
+            LocalDate fromDate,
+            LocalDate toDate,
+            Pageable pageable) {
 
+        Specification<Booking> specification =
+                Specification.allOf(
+                        BookingSpecification.hasStatus(status),
+                        BookingSpecification.fromDate(fromDate),
+                        BookingSpecification.toDate(toDate)
+                );
+
+        return bookingRepository
+                .findAll(specification, pageable)
+                .map(this::mapToBookingResponse);
+    }
 
 }

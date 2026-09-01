@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.smartbooking.booking.exception.BookingNotFoundException;
 import com.smartbooking.booking.exception.BookingOperationException;
+import jakarta.persistence.OptimisticLockException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -109,6 +110,18 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(
                 400,
                 exception.getMessage(),
+                null
+        );
+    }
+
+    @ExceptionHandler(OptimisticLockException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleOptimisticLockException(
+            OptimisticLockException exception) {
+
+        return new ErrorResponse(
+                409,
+                "Booking was modified by another user. Please refresh and try again",
                 null
         );
     }
