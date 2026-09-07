@@ -8,6 +8,8 @@ import com.smartbooking.booking.service.BookingService;
 import com.smartbooking.entity.User;
 import com.smartbooking.repository.UserRepository;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -37,12 +39,12 @@ public class BookingController {
 
     }
 
-    @GetMapping
-    public List<BookingResponse> getMyBookings(Authentication authentication){
+    @GetMapping("/my")
+    public Page<BookingResponse> getMyBookings(Authentication authentication, Pageable pageable){
 
         String email = authentication.getName();
 
-        return bookingService.getMyBookings(email);
+        return bookingService.getMyBookings(email,pageable);
     }
 
 

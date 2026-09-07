@@ -4,6 +4,18 @@ public enum BookingStatus {
 
     PENDING,
     CONFIRMED,
-    CANCELLED
+    CANCELLED;
 
+
+    public boolean canBeUpdated() {
+        return this == PENDING;
+    }
+
+    public boolean canBeConfirmed() {
+        return this == PENDING;
+    }
+
+    public boolean canBeCancelled() {
+        return this == PENDING || this == CONFIRMED;
+    }
 }

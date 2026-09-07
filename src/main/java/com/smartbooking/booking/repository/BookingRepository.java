@@ -18,20 +18,35 @@ public interface BookingRepository extends JpaRepository<Booking,Long>,
 
     List<Booking> findByUserId(Long userId);
 
+    Page<Booking> findByUserId(Long userId,Pageable pageable);
+
     Optional<Booking> findByIdAndUserId(Long id, Long userId);
 
-    @Query("""
-        SELECT b
-        FROM Booking b
-        WHERE (:status IS NULL OR b.status = :status)
-        AND (:fromDate IS NULL OR b.bookingDate >= :fromDate)
-        AND (:toDate IS NULL OR b.bookingDate <= :toDate)
-        """)
-    Page<Booking> searchBookings(
-            @Param("status") BookingStatus status,
-            @Param("fromDate") LocalDate fromDate,
-            @Param("toDate") LocalDate toDate,
-            Pageable pageable);
+    boolean existsByUserIdAndBookingDate(
+            Long userId,
+            LocalDate bookingDate
+    );
+
+    boolean existsByUserIdAndBookingDateAndIdNot(
+            Long userId,
+            LocalDate bookingDate,
+            Long id
+    );
+
+
+
+//    @Query("""
+//        SELECT b
+//        FROM Booking b
+//        WHERE (:status IS NULL OR b.status = :status)
+//        AND (:fromDate IS NULL OR b.bookingDate >= :fromDate)
+//        AND (:toDate IS NULL OR b.bookingDate <= :toDate)
+//        """)
+//    Page<Booking> searchBookings(
+//            @Param("status") BookingStatus status,
+//            @Param("fromDate") LocalDate fromDate,
+//            @Param("toDate") LocalDate toDate,
+//            Pageable pageable);
 }
 
 

@@ -3,10 +3,13 @@ package com.smartbooking.exception;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.smartbooking.booking.exception.BookingConflictException;
 import com.smartbooking.booking.exception.BookingNotFoundException;
 import com.smartbooking.booking.exception.BookingOperationException;
 import jakarta.persistence.OptimisticLockException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.smartbooking.dto.ErrorResponse;
 
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -123,6 +127,48 @@ public class GlobalExceptionHandler {
                 409,
                 "Booking was modified by another user. Please refresh and try again",
                 null
+        );
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleIllegalArgumentException(IllegalArgumentException exception){
+
+        return new ErrorResponse(
+                400,
+                exception.getMessage(),null
+        );
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleTypeMismatch(
+            MethodArgumentTypeMismatchException ex) {
+
+        String parameter = ex.getName();
+
+
+        return new ErrorResponse(
+                400,
+                "Invalid value for parameter: ",null
+        );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleDataIntegrityViolation(DataIntegrityViolationException exception){
+        return new ErrorResponse(
+                409,
+                "Booking already exists for this date",null
+        );
+    }
+
+    @ExceptionHandler(BookingConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleBookingConflict(BookingConflictException exception){
+        return new ErrorResponse(
+                409,
+                exception.getMessage(),null
         );
     }
 

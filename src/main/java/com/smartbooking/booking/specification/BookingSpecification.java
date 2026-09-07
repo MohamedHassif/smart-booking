@@ -50,4 +50,31 @@ public class BookingSpecification {
             );
         };
     }
+
+    public static Specification<Booking> hasUserId(Long userId) {
+        return (root, query, criteriaBuilder) -> {
+
+            if (userId == null) {
+                return null;
+            }
+
+            return criteriaBuilder.equal(
+                    root.get("user").get("id"),
+                    userId
+            );
+        };
+    }
+
+    public static Specification<Booking> hasEmail(String email) {
+        return (root, query, criteriaBuilder) -> {
+            if (email == null || email.isBlank()) {
+                return null;
+            }
+
+            return criteriaBuilder.equal(
+                    criteriaBuilder.lower(root.get("user").get("email")),
+                    "%"+email.toLowerCase()+"%"
+            );
+        };
+    }
 }

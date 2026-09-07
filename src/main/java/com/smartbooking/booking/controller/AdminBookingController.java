@@ -1,6 +1,7 @@
 package com.smartbooking.booking.controller;
 
 import com.smartbooking.booking.dto.BookingResponse;
+import com.smartbooking.booking.entity.BookingSortFields;
 import com.smartbooking.booking.entity.BookingStatus;
 import com.smartbooking.booking.service.BookingService;
 import org.springframework.data.domain.Page;
@@ -46,12 +47,22 @@ public class AdminBookingController {
             @RequestParam(required = false) BookingStatus status,
             @RequestParam(required = false) LocalDate fromDate,
             @RequestParam(required = false) LocalDate toDate,
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) String email,
             Pageable pageable) {
+
+        for(var order : pageable.getSort()){
+            if(!BookingSortFields.ALLOWED_FIELDS.contains(order.getProperty())){
+                throw new IllegalArgumentException( "Sorting by '" + order.getProperty() + "' is not allowed");
+            }
+        }
 
         return bookingService.searchBookings(
                 status,
                 fromDate,
                 toDate,
+                userId,
+                email,
                 pageable
         );
     }

@@ -5,6 +5,7 @@ import com.smartbooking.booking.dto.BookingRequest;
 import com.smartbooking.booking.dto.BookingResponse;
 import com.smartbooking.booking.entity.Booking;
 import com.smartbooking.booking.entity.BookingStatus;
+import com.smartbooking.booking.exception.BookingConflictException;
 import com.smartbooking.booking.exception.BookingNotFoundException;
 import com.smartbooking.booking.exception.BookingOperationException;
 import com.smartbooking.booking.repository.BookingRepository;
@@ -38,7 +39,16 @@ public class BookingService {
     public BookingResponse createBooking(BookingRequest request, String email){
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(()->new RuntimeException("User not found"));
+                .orElseThrow(()->new UserNotFoundException("User not found"));
+
+        if (bookingRepository.existsByUserIdAndBookingDate(
+                user.getId(),
+                request.getBookingDate())) {
+
+            throw new BookingConflictException(
+                    "You already have a booking for this date"
+            );
+        }
 
         Booking booking = new Booking();
 
@@ -62,16 +72,14 @@ public class BookingService {
     }
 
     @Transactional(readOnly = true)
-    public List<BookingResponse> getMyBookings(String email){
+    public Page<BookingResponse> getMyBookings(String email,Pageable pageable){
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(()->new RuntimeException("User not found"));
+                .orElseThrow(()->new UserNotFoundException("User not found"));
 
-        List<Booking> bookings = bookingRepository.findByUserId(user.getId());
+//        List<Booking> bookings = bookingRepository.findByUserId(user.getId()).map(this::mapToBookingResponse);
 
-        return bookings.stream()
-                .map(this::mapToBookingResponse)
-                .toList();
+        return bookingRepository.findByUserId(user.getId(),pageable).map(this::mapToBookingResponse);
     }
 
     private BookingResponse mapToBookingResponse(Booking booking) {
@@ -101,6 +109,7 @@ public class BookingService {
         return mapToBookingResponse(booking);
     }
 
+    @Transactional
     public BookingResponse updateBooking(Long bookingId,BookingRequest request,String email){
 
         User user = userRepository.findByEmail(email)
@@ -109,7 +118,17 @@ public class BookingService {
         Booking booking = bookingRepository.findByIdAndUserId(bookingId,user.getId())
                 .orElseThrow(()-> new BookingNotFoundException("Booking not found !"));
 
-        if(booking.getStatus() != BookingStatus.PENDING){
+        if (bookingRepository.existsByUserIdAndBookingDateAndIdNot(
+                user.getId(),
+                request.getBookingDate(),
+                bookingId)) {
+
+            throw new BookingConflictException(
+                    "You already have a booking for this date"
+            );
+        }
+
+        if(!booking.getStatus().canBeUpdated()){
             throw new BookingOperationException("Only PENDING booking can be updated");
         }
 
@@ -136,9 +155,9 @@ public class BookingService {
                 .orElseThrow(() ->
                         new BookingNotFoundException("Booking not found"));
 
-        if (booking.getStatus() == BookingStatus.CANCELLED) {
+        if (!booking.getStatus().canBeCancelled()) {
             throw new BookingOperationException(
-                    "Booking is already cancelled"
+                    "Only PENDING or CONFIRMED booking can be cancelled"
             );
         }
 
@@ -156,11 +175,12 @@ public class BookingService {
 //                .map(this::mapToBookingResponse);
 //    }
 
+    @Transactional
     public BookingResponse confirmBooking(Long bookingId){
 
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(()-> new BookingNotFoundException("Booking not found"));
 
-        if(booking.getStatus() != BookingStatus.PENDING){
+        if(!booking.getStatus().canBeConfirmed()){
             throw new BookingOperationException("Only pending booking can be CONFIRMED");
         }
 
@@ -176,13 +196,17 @@ public class BookingService {
             BookingStatus status,
             LocalDate fromDate,
             LocalDate toDate,
+            Long userId,
+            String email,
             Pageable pageable) {
 
         Specification<Booking> specification =
                 Specification.allOf(
                         BookingSpecification.hasStatus(status),
                         BookingSpecification.fromDate(fromDate),
-                        BookingSpecification.toDate(toDate)
+                        BookingSpecification.toDate(toDate),
+                        BookingSpecification.hasUserId(userId),
+                        BookingSpecification.hasEmail(email)
                 );
 
         return bookingRepository
