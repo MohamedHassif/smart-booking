@@ -23,33 +23,25 @@ public class BookingSpecification {
         };
     }
 
-    public static Specification<Booking> fromDate(LocalDate fromDate) {
-        return (root, query, criteriaBuilder) -> {
+public static Specification<Booking> fromDate(LocalDate fromDate) {
+    return (root, query, cb) ->
+            fromDate == null
+                    ? null
+                    : cb.greaterThanOrEqualTo(
+                            root.get("checkInDate"),
+                            fromDate
+                    );
+}
 
-            if (fromDate == null) {
-                return null;
-            }
-
-            return criteriaBuilder.greaterThanOrEqualTo(
-                    root.get("bookingDate"),
-                    fromDate
-            );
-        };
-    }
-
-    public static Specification<Booking> toDate(LocalDate toDate) {
-        return (root, query, criteriaBuilder) -> {
-
-            if (toDate == null) {
-                return null;
-            }
-
-            return criteriaBuilder.lessThanOrEqualTo(
-                    root.get("bookingDate"),
-                    toDate
-            );
-        };
-    }
+public static Specification<Booking> toDate(LocalDate toDate) {
+    return (root, query, cb) ->
+            toDate == null
+                    ? null
+                    : cb.lessThanOrEqualTo(
+                            root.get("checkInDate"),
+                            toDate
+                    );
+}
 
     public static Specification<Booking> hasUserId(Long userId) {
         return (root, query, criteriaBuilder) -> {

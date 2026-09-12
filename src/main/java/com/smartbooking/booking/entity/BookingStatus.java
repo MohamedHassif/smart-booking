@@ -4,8 +4,8 @@ public enum BookingStatus {
 
     PENDING,
     CONFIRMED,
-    CANCELLED;
-
+    CANCELLED,
+    COMPLETED;
 
     public boolean canBeUpdated() {
         return this == PENDING;
@@ -17,5 +17,9 @@ public enum BookingStatus {
 
     public boolean canBeCancelled() {
         return this == PENDING || this == CONFIRMED;
+    }
+
+    public boolean canBeCompleted() {
+        return this == CONFIRMED;
     }
 }

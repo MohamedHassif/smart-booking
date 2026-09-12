@@ -8,10 +8,11 @@ public final class BookingSortFields {
 
     }
 
-    public static final Set<String> ALLOWED_FIELDS = Set.of(
-            "id",
-            "bookingDate",
-            "status",
-            "createdAt"
-    );
+public static final Set<String> ALLOWED_FIELDS = Set.of(
+        "id",
+        "checkInDate",
+        "checkOutDate",
+        "status",
+        "createdAt"
+);
 }

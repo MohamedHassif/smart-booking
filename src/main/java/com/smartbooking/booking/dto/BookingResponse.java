@@ -8,7 +8,10 @@ import com.smartbooking.booking.entity.BookingStatus;
 public class BookingResponse {
 
     private Long id;
-    private LocalDate bookingDate;
+    private Long roomId;
+    private String roomNumber;
+    private LocalDate checkInDate;
+    private LocalDate checkOutDate;
     private BookingStatus status;
     private Integer numberOfGuests;
     private LocalDateTime createdAt;
@@ -16,14 +19,20 @@ public class BookingResponse {
 
     public BookingResponse(
             Long id,
-            LocalDate bookingDate,
+            Long roomId,
+            String roomNumber,
+            LocalDate checkInDate,
+            LocalDate checkOutDate,
             BookingStatus status,
             Integer numberOfGuests,
             LocalDateTime createdAt,
             Long userId) {
 
         this.id = id;
-        this.bookingDate = bookingDate;
+        this.roomId = roomId;
+        this.roomNumber = roomNumber;
+        this.checkInDate = checkInDate;
+        this.checkOutDate = checkOutDate;
         this.status = status;
         this.numberOfGuests = numberOfGuests;
         this.createdAt = createdAt;
@@ -34,8 +43,20 @@ public class BookingResponse {
         return id;
     }
 
-    public LocalDate getBookingDate() {
-        return bookingDate;
+    public Long getRoomId() {
+        return roomId;
+    }
+
+    public String getRoomNumber() {
+        return roomNumber;
+    }
+
+    public LocalDate getCheckInDate() {
+        return checkInDate;
+    }
+
+    public LocalDate getCheckOutDate() {
+        return checkOutDate;
     }
 
     public BookingStatus getStatus() {
